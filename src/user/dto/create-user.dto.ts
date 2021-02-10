@@ -1,4 +1,3 @@
-import { PrimaryColumn } from 'typeorm';
 
 export class CreateUserDto {
   username: string;

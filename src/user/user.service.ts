@@ -43,11 +43,13 @@ export class UserService {
   }
 
   async signIn(authUserDto: AuthUserDto): Promise<{ token: string }> {
-    const user = await getRepository(User).findOneOrFail({
-      where: { email: authUserDto.email },
-    }).catch(() => {
-      throw new ErrorDto("user not found", HttpStatus.NOT_FOUND)
-    });
+    const user = await getRepository(User)
+      .findOneOrFail({
+        where: { email: authUserDto.email },
+      })
+      .catch(() => {
+        throw new ErrorDto('user not found', HttpStatus.NOT_FOUND);
+      });
 
     const matchPassword = await this.comparePasswords(
       user.password,
@@ -66,15 +68,32 @@ export class UserService {
     return user;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: number) {
+    const user = await getRepository(User)
+      .findOneOrFail()
+      .catch((e) => {
+        throw new ErrorDto('user not found', HttpStatus.NOT_FOUND);
+      });
+    return user as UserDto;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    let user = await getRepository(User)
+      .findOneOrFail(id)
+      .catch((e) => {
+        throw new ErrorDto('user not found', HttpStatus.NOT_FOUND);
+      });
+
+    await getRepository(User).merge(user, updateUserDto);
+    getRepository(User).save(user);
+    return user as UserDto;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number): Promise<void> {
+    await getRepository(User)
+      .delete(id)
+      .catch((e) => {
+        throw new ErrorDto('user not found', HttpStatus.NOT_FOUND);
+      });
   }
 }
