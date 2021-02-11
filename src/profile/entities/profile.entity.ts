@@ -1,5 +1,5 @@
 import User from "src/user/entities/user.entity";
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Profile {
@@ -14,4 +14,7 @@ export class Profile {
 
     @OneToOne(() => User, user => user.profile)
     user: User
+
+    @ManyToMany(() => User, user => user.user_follow)
+    user_follow: User[]
 }

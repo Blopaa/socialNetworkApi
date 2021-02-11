@@ -13,15 +13,13 @@ import { ProfileService } from 'src/profile/profile.service';
 
 @Injectable()
 export class UserService {
-
-
   constructor(
     @InjectRepository(User)
     private userRespository: Repository<User>,
 
     @Inject(ProfileService)
-    private profileService: ProfileService
-  ){}
+    private profileService: ProfileService,
+  ) {}
 
   private async jwtcreation(savedUser: User) {
     return {
@@ -46,13 +44,13 @@ export class UserService {
   async signUp(createUserDto: CreateUserDto): Promise<{ token: string }> {
     const newUser = await this.userRespository.create(createUserDto);
     newUser.password = await this.encryptPassword(createUserDto.password);
-    const profile = await this.profileService.create({nickname: createUserDto.nickname});
-    newUser.profile = profile
-    const savedUser = await this.userRespository
-      .save(newUser)
-      .catch((err) => {
-        throw new ErrorDto(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
-      });
+    const profile = await this.profileService.create({
+      nickname: createUserDto.nickname,
+    });
+    newUser.profile = profile;
+    const savedUser = await this.userRespository.save(newUser).catch((err) => {
+      throw new ErrorDto(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    });
     return this.jwtcreation(savedUser);
   }
 
@@ -83,20 +81,16 @@ export class UserService {
   }
 
   async findOne(id: number) {
-    const user = await this.userRespository
-      .findOneOrFail()
-      .catch(() => {
-        throw new ErrorDto('user not found', HttpStatus.NOT_FOUND);
-      });
+    const user = await this.userRespository.findOneOrFail(id).catch(() => {
+      throw new ErrorDto('user not found', HttpStatus.NOT_FOUND);
+    });
     return user as UserDto;
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
-    let user = await this.userRespository
-      .findOneOrFail(id)
-      .catch(() => {
-        throw new ErrorDto('user not found', HttpStatus.NOT_FOUND);
-      });
+    let user = await this.userRespository.findOneOrFail(id).catch(() => {
+      throw new ErrorDto('user not found', HttpStatus.NOT_FOUND);
+    });
 
     await this.userRespository.merge(user, updateUserDto);
     this.userRespository.save(user);
@@ -104,10 +98,24 @@ export class UserService {
   }
 
   async remove(id: number): Promise<void> {
-    await this.userRespository
-      .delete(id)
+    await this.userRespository.delete(id).catch(() => {
+      throw new ErrorDto('user not found', HttpStatus.NOT_FOUND);
+    });
+  }
+
+  async follow_profile(userId: number, profileId: number) {
+    const user = await this.userRespository
+      .findOneOrFail(userId, { relations: ['user_follow'] })
       .catch(() => {
         throw new ErrorDto('user not found', HttpStatus.NOT_FOUND);
       });
+    const profile = await this.profileService.findOne(profileId);
+    if (user.user_follow.length) {
+      user.user_follow = [];
+    } else {
+      user.user_follow = [profile];
+    }
+
+    await this.userRespository.save(user);
   }
 }
