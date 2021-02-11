@@ -1,6 +1,6 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { forwardRef, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import ErrorDto from 'src/dto/errorDto';
-import { getRepository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from './dto/user.dto';
@@ -8,9 +8,21 @@ import User from './entities/user.entity';
 import { sign } from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
 import { AuthUserDto } from './dto/auth-user.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ProfileService } from 'src/profile/profile.service';
 
 @Injectable()
 export class UserService {
+
+
+  constructor(
+    @InjectRepository(User)
+    private userRespository: Repository<User>,
+
+    @Inject(ProfileService)
+    private profileService: ProfileService
+  ){}
+
   private async jwtcreation(savedUser: User) {
     return {
       token: sign({ id: savedUser.id }, process.env.SECRET || '', {
@@ -32,9 +44,11 @@ export class UserService {
   }
 
   async signUp(createUserDto: CreateUserDto): Promise<{ token: string }> {
-    const newUser = await getRepository(User).create(createUserDto);
+    const newUser = await this.userRespository.create(createUserDto);
     newUser.password = await this.encryptPassword(createUserDto.password);
-    const savedUser = await getRepository(User)
+    const profile = await this.profileService.create({nickname: createUserDto.nickname});
+    newUser.profile = profile
+    const savedUser = await this.userRespository
       .save(newUser)
       .catch((err) => {
         throw new ErrorDto(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -43,7 +57,7 @@ export class UserService {
   }
 
   async signIn(authUserDto: AuthUserDto): Promise<{ token: string }> {
-    const user = await getRepository(User)
+    const user = await this.userRespository
       .findOneOrFail({
         where: { email: authUserDto.email },
       })
@@ -64,35 +78,35 @@ export class UserService {
   }
 
   async findAll() {
-    const user = (await getRepository(User).find()) as UserDto[];
+    const user = (await this.userRespository.find()) as UserDto[];
     return user;
   }
 
   async findOne(id: number) {
-    const user = await getRepository(User)
+    const user = await this.userRespository
       .findOneOrFail()
-      .catch((e) => {
+      .catch(() => {
         throw new ErrorDto('user not found', HttpStatus.NOT_FOUND);
       });
     return user as UserDto;
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
-    let user = await getRepository(User)
+    let user = await this.userRespository
       .findOneOrFail(id)
-      .catch((e) => {
+      .catch(() => {
         throw new ErrorDto('user not found', HttpStatus.NOT_FOUND);
       });
 
-    await getRepository(User).merge(user, updateUserDto);
-    getRepository(User).save(user);
+    await this.userRespository.merge(user, updateUserDto);
+    this.userRespository.save(user);
     return user as UserDto;
   }
 
   async remove(id: number): Promise<void> {
-    await getRepository(User)
+    await this.userRespository
       .delete(id)
-      .catch((e) => {
+      .catch(() => {
         throw new ErrorDto('user not found', HttpStatus.NOT_FOUND);
       });
   }
