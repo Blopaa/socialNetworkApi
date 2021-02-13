@@ -26,4 +26,9 @@ export class ProfileController {
   remove(@Param('id') id: string) {
     return this.profileService.remove(+id);
   }
+
+  @Post(':profileId/:postId')
+  giveLike(@Param() {profileId, postId}: {profileId: number, postId: number}){
+    return this.profileService.profileLikes(profileId, postId)
+  }
 }

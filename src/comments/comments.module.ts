@@ -7,8 +7,9 @@ import { PostModule } from 'src/post/post.module';
 import { ProfileModule } from 'src/profile/profile.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Comment]), PostModule, ProfileModule],
+  imports: [TypeOrmModule.forFeature([Comment]), forwardRef(() => PostModule), forwardRef(() =>  ProfileModule)],
   controllers: [CommentsController],
   providers: [CommentsService],
+  exports: [CommentsService]
 })
 export class CommentsModule {}

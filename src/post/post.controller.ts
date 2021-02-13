@@ -31,4 +31,9 @@ export class PostController {
   remove(@Param('id') id: string) {
     return this.postService.remove(+id);
   }
+
+  @Post('likes/:id')
+  getPostLikes(@Param('id') id: number){
+    return this.getPostLikes(id)
+  }
 }

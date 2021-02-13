@@ -1,5 +1,7 @@
 import { forwardRef, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CommentsService } from 'src/comments/comments.service';
+import { Comment } from 'src/comments/entities/comment.entity';
 import ErrorDto from 'src/dto/errorDto';
 import { ProfileService } from 'src/profile/profile.service';
 import { Repository } from 'typeorm';
@@ -18,15 +20,15 @@ export class PostService {
   ) {}
 
   async create(createPostDto: CreatePostDto) {
-    // const post = this.postRespository.create({
-    //   message: createPostDto.message,
-    // });
-    // post.profile = await this.profileServices
-    //   .findOne(createPostDto.profileId)
-    //   .catch((err) => {
-    //     throw err;
-    //   });
-    // return await this.postRespository.save(post);
+    const post = this.postRespository.create({
+      message: createPostDto.message,
+    });
+    post.profile = await this.profileServices
+      .findOne(createPostDto.profileId)
+      .catch((err) => {
+        throw err;
+      });
+    return await this.postRespository.save(post);
   }
 
   async findAll() {
@@ -50,5 +52,13 @@ export class PostService {
     return await this.postRespository.delete(id).catch(() => {
       throw new ErrorDto('user not found', HttpStatus.NOT_FOUND);
     });
+  }
+
+  async getPostLikes(id: number) {
+    const post = await this.postRespository.findOne(id, {
+      relations: ['profile_likes'],
+    });
+
+    return post.profile_likes
   }
 }

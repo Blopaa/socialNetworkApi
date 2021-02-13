@@ -1,4 +1,4 @@
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { forwardRef, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import ErrorDto from 'src/dto/errorDto';
 import { PostService } from 'src/post/post.service';
@@ -14,10 +14,10 @@ export class CommentsService {
     @InjectRepository(Comment)
     private commentRespository: Repository<Comment>,
 
-    @Inject(ProfileService)
+    @Inject(forwardRef(() => ProfileService))
     private profileService: ProfileService,
 
-    @Inject(PostService)
+    @Inject(forwardRef(() => PostService))
     private postService: PostService,
   ) {}
 
@@ -56,5 +56,11 @@ export class CommentsService {
     return await this.commentRespository.delete(id).catch(() => {
       throw new ErrorDto('comment not found', HttpStatus.NOT_FOUND);
     });
+  }
+
+  async getPostComments(postId: number){
+    const post = await this.postService.findOne(postId)
+    const comments = await this.commentRespository.find({where: {post: post}})
+    return comments
   }
 }
