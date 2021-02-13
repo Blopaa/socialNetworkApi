@@ -1,6 +1,6 @@
 import { Comment } from "src/comments/entities/comment.entity";
 import { Profile } from "src/profile/entities/profile.entity";
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Post {
@@ -16,4 +16,7 @@ export class Post {
 
     @OneToMany(() => Comment, comment => comment.post)
     comment: Comment[]
+
+    @ManyToMany(() => Profile, profile => profile.profile_likes)
+    profile_likes: Profile[]
 }

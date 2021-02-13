@@ -110,10 +110,10 @@ export class UserService {
         throw new ErrorDto('user not found', HttpStatus.NOT_FOUND);
       });
     const profile = await this.profileService.findOne(profileId);
-    if (user.user_follow.length) {
-      user.user_follow = [];
+    if (user.user_follow.find(u => u.id === profile.id)) {
+      user.user_follow = user.user_follow.filter(u => u.id !== profile.id);
     } else {
-      user.user_follow = [profile];
+      user.user_follow = [...user.user_follow, profile];
     }
 
     await this.userRespository.save(user);

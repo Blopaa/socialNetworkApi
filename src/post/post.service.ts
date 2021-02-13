@@ -1,4 +1,4 @@
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { forwardRef, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import ErrorDto from 'src/dto/errorDto';
 import { ProfileService } from 'src/profile/profile.service';
@@ -13,20 +13,20 @@ export class PostService {
     @InjectRepository(Post)
     private postRespository: Repository<Post>,
 
-    @Inject(ProfileService)
+    @Inject(forwardRef(() => ProfileService))
     private profileServices: ProfileService,
   ) {}
 
   async create(createPostDto: CreatePostDto) {
-    const post = this.postRespository.create({
-      message: createPostDto.message,
-    });
-    post.profile = await this.profileServices
-      .findOne(createPostDto.profileId)
-      .catch((err) => {
-        throw err;
-      });
-    return await this.postRespository.save(post);
+    // const post = this.postRespository.create({
+    //   message: createPostDto.message,
+    // });
+    // post.profile = await this.profileServices
+    //   .findOne(createPostDto.profileId)
+    //   .catch((err) => {
+    //     throw err;
+    //   });
+    // return await this.postRespository.save(post);
   }
 
   async findAll() {
