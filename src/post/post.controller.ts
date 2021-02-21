@@ -34,6 +34,11 @@ export class PostController {
 
   @Post('likes/:id')
   getPostLikes(@Param('id') id: number){
-    return this.getPostLikes(id)
+    return this.postService.getPostLikes(id)
+  }
+
+  @Get('/posts/:order')
+  getPost(@Param('order') order: number){
+    return this.postService.getPosts(order)
   }
 }

@@ -35,6 +35,11 @@ export class PostService {
     return await this.postRespository.find();
   }
 
+  async getPosts(order: number){
+    const allPosts = await this.postRespository.find({order: {createdAt: "ASC"}})
+    return allPosts.slice(order * 10, (order*10) + 9)
+  }
+
   async findOne(id: number) {
     return await this.postRespository.findOneOrFail(id).catch(() => {
       throw new ErrorDto('user not found', HttpStatus.NOT_FOUND);
