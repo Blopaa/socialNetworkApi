@@ -35,9 +35,11 @@ export class PostService {
     return await this.postRespository.find();
   }
 
-  async getPosts(order: number){
-    const allPosts = await this.postRespository.find({order: {createdAt: "ASC"}})
-    return allPosts.slice(order * 10, (order*10) + 9)
+  async getPosts(order: number) {
+    const allPosts = await this.postRespository.find({
+      relations: ['profile'],
+    });
+    return allPosts.reverse().slice(0, order * 10 + 10);
   }
 
   async findOne(id: number) {
@@ -64,6 +66,6 @@ export class PostService {
       relations: ['profile_likes'],
     });
 
-    return post.profile_likes
+    return post.profile_likes;
   }
 }

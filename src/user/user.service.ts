@@ -42,7 +42,7 @@ export class UserService {
   }
 
   async signUp(createUserDto: CreateUserDto): Promise<{ token: string }> {
-    const newUser = await this.userRespository.create(createUserDto);
+    const newUser = await this.userRespository.create({username: createUserDto.username, email: createUserDto.email, password: createUserDto.password});
     newUser.password = await this.encryptPassword(createUserDto.password);
     const profile = await this.profileService.create({
       nickname: createUserDto.nickname,

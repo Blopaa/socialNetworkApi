@@ -39,6 +39,6 @@ export class PostController {
 
   @Get('/posts/:order')
   getPost(@Param('order') order: number){
-    return this.postService.getPosts(order)
+    return this.postService.getPosts(order);
   }
 }
