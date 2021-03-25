@@ -17,7 +17,7 @@ export class UserService {
     @InjectRepository(User)
     private userRespository: Repository<User>,
 
-    @Inject(ProfileService)
+    @Inject(forwardRef(() => ProfileService))
     private profileService: ProfileService,
   ) {}
 
@@ -81,7 +81,7 @@ export class UserService {
   }
 
   async findOne(id: number) {
-    const user = await this.userRespository.findOneOrFail(id).catch(() => {
+    const user = await this.userRespository.findOneOrFail(id, {relations: ['profile']}).catch(() => {
       throw new ErrorDto('user not found', HttpStatus.NOT_FOUND);
     });
     return user as UserDto;

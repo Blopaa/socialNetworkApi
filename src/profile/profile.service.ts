@@ -6,12 +6,17 @@ import { Repository } from 'typeorm';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { Profile } from './entities/profile.entity';
+import { UserService } from "../user/user.service";
+import User from "../user/entities/user.entity";
 
 @Injectable()
 export class ProfileService {
   constructor(
     @InjectRepository(Profile)
     private profileRespository: Repository<Profile>,
+
+    @Inject(forwardRef(() => UserService))
+    private userService: UserService,
 
     @Inject(forwardRef(() => PostService))
     private postServices: PostService
@@ -33,8 +38,9 @@ export class ProfileService {
   }
 
   async findOne(id: number) {
+    const user = await this.userService.findOne(id) as User;
     return await this.profileRespository
-      .findOneOrFail(id)
+      .findOneOrFail({where: {id: user.profile.id}})
       .catch((err: ErrorDto) => {
         throw new ErrorDto('profile not found', HttpStatus.NOT_FOUND);
       });

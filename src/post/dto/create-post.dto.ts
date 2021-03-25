@@ -1,4 +1,4 @@
 export class CreatePostDto {
-  profileId: number;
+  userId: number;
   public message: string;
 }
