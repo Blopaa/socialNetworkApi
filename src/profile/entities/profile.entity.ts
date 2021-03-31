@@ -31,5 +31,11 @@ export class Profile {
         name: 'profile_likes'
     })
     profile_likes: Post[]
+
+    @ManyToMany(() => Comment, comment => comment.comment_likes)
+    @JoinTable({
+        name: 'comment_likes'
+    })
+    comment_likes: Post[]
     
 }

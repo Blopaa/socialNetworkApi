@@ -40,7 +40,7 @@ export class ProfileService {
   async findOne(id: number) {
     const user = await this.userService.findOne(id) as User;
     return await this.profileRespository
-      .findOneOrFail({where: {id: user.profile.id}})
+      .findOneOrFail({where: {id: user.profile.id}, relations: ['profile_likes']})
       .catch((err: ErrorDto) => {
         throw new ErrorDto('profile not found', HttpStatus.NOT_FOUND);
       });
@@ -62,12 +62,8 @@ export class ProfileService {
     });
   }
 
-  async profileLikes(profileId: number, postId: number) {
-    const profile = await this.profileRespository
-      .findOneOrFail(profileId, { relations: ['user_follow'] })
-      .catch(() => {
-        throw new ErrorDto('user not found', HttpStatus.NOT_FOUND);
-      });
+  async profileLikes(userId: number, postId: number) {
+    const profile = await this.findOne(userId);
     const post = await this.postServices.findOne(postId);
     if (profile.profile_likes.find(p => p.id === post.id)) {
       profile.profile_likes = profile.profile_likes.filter(p => p.id !== post.id);
@@ -76,5 +72,10 @@ export class ProfileService {
     }
 
     await this.profileRespository.save(profile);
+  }
+
+  async getProfileLikes(userId: number){
+    const profile = await this.findOne(userId);
+    return profile.profile_likes;
   }
 }

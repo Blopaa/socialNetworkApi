@@ -1,5 +1,3 @@
-
-import { Comment } from "src/comments/entities/comment.entity";
 import { BaseEntity } from "src/entity/BaseEntity";
 import { Profile } from "src/profile/entities/profile.entity";
 import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
@@ -16,9 +14,12 @@ export class Post extends BaseEntity {
     @JoinColumn()
     profile: Profile
 
-    @OneToMany(() => Comment, comment => comment.post)
-    comment: Comment[]
+    @OneToMany(() => Post, post => post.post)
+    comment: Post[]
 
     @ManyToMany(() => Profile, profile => profile.profile_likes)
     profile_likes: Profile[]
+
+    @ManyToOne(() => Post, post => post.comment)
+    post: Post
 }

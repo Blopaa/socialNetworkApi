@@ -28,8 +28,13 @@ export class ProfileController {
     return this.profileService.remove(+id);
   }
 
-  @Post(':profileId/:postId')
-  giveLike(@Param() {profileId, postId}: {profileId: number, postId: number}){
-    return this.profileService.profileLikes(profileId, postId)
+  @Post(':postId')
+  giveLike(@Param() {postId}: { postId: number}, @Req() req: TokenRequest){
+    return this.profileService.profileLikes(req.userId, postId)
+  }
+
+  @Get("/user-likes")
+  getUserLikes(@Req() req: TokenRequest){
+    return this.profileService.getProfileLikes(req.userId)
   }
 }
