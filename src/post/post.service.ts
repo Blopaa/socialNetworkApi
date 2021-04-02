@@ -32,11 +32,6 @@ export class PostService {
     return await this.postRespository.save(comment);
   }
 
-  async getPostComments(postId: number){
-    const post = await this.findOne(postId)
-    return await this.postRespository.find({where: {post: post}})
-  }
-
   async create(createPostDto: CreatePostDto, userId:number) {
     const post = this.postRespository.create({
       message: createPostDto.message
@@ -50,18 +45,18 @@ export class PostService {
   }
 
   async findAll() {
-    return await this.postRespository.find();
+    return await this.postRespository.find({relations: ['profile', "post", "comment"]});
   }
 
   async getPosts(order: number) {
     const allPosts = await this.postRespository.find({
-      relations: ["profile"]
+      relations: ["profile", "post", "comment", "post.profile"]
     });
     return allPosts.reverse().slice(0, order * 10 + 10);
   }
 
   async findOne(id: number) {
-    return await this.postRespository.findOneOrFail(id, {relations: ['profile']}).catch(() => {
+    return await this.postRespository.findOneOrFail(id, {relations: ['profile', 'comment', 'post', "comment.profile"]}).catch(() => {
       throw new ErrorDto("user not found", HttpStatus.NOT_FOUND);
     });
   }

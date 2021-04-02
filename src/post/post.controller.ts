@@ -38,13 +38,6 @@ export class PostController {
     });
   }
 
-  @Get("/comments/:id")
-  getPostComments(@Param('id') id: number){
-    return this.postService.getPostComments(id).catch((err: ErrorDto) => {
-      throw new HttpException(err.getMessage, err.getStatus);
-    });
-  }
-
   @Put(':id')
   update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
     return this.postService.update(+id, updatePostDto).catch((err: ErrorDto) => {

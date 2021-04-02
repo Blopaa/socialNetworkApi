@@ -5,7 +5,6 @@ import { pgConfig } from './orm.config';
 import { UserModule } from './user/user.module';
 import { ProfileModule } from './profile/profile.module';
 import { PostModule } from './post/post.module';
-import { CommentsModule } from './comments/comments.module';
 import { TokenVerificationMiddleware } from "./token-verification.middleware";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const morgan = require('morgan');
@@ -18,8 +17,7 @@ const morgan = require('morgan');
     }),
     UserModule,
     ProfileModule,
-    PostModule,
-    CommentsModule,]
+    PostModule,]
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
