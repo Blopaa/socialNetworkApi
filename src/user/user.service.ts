@@ -104,12 +104,13 @@ export class UserService {
   }
 
   async follow_profile(userId: number, profileId: number) {
+    if(userId == profileId) throw new ErrorDto("you cant follow to itself", HttpStatus.BAD_REQUEST)
     const user = await this.userRespository
       .findOneOrFail(userId, { relations: ['user_follow'] })
       .catch(() => {
         throw new ErrorDto('user not found', HttpStatus.NOT_FOUND);
       });
-    const profile = await this.profileService.findOne(profileId);
+    const profile = await this.profileService.findOneById(profileId);
     if (user.user_follow.find(u => u.id === profile.id)) {
       user.user_follow = user.user_follow.filter(u => u.id !== profile.id);
     } else {

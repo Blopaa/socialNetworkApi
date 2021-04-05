@@ -6,14 +6,15 @@ import {
   Put,
   Param,
   Delete,
-  HttpException,
-} from '@nestjs/common';
+  HttpException, Req
+} from "@nestjs/common";
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import ErrorDto from 'src/dto/errorDto';
 import { UserDto } from './dto/user.dto';
 import { AuthUserDto } from './dto/auth-user.dto';
+import { TokenRequest } from "../token-verification.middleware";
 
 @Controller('user')
 export class UserController {
@@ -61,9 +62,9 @@ export class UserController {
     });
   }
 
-  @Post('/:userId/:profileId')
-  followUser(@Param() params: { userId: number; profileId: number }) {
-    return this.userService.follow_profile(params.userId, params.profileId).catch((err: ErrorDto) => {
+  @Post('/follow/:profileId')
+  followUser(@Param() params: { profileId: number }, @Req() req: TokenRequest) {
+    return this.userService.follow_profile(req.userId, params.profileId).catch((err: ErrorDto) => {
       throw new HttpException(err.getMessage, err.getStatus);
     });
   }

@@ -46,6 +46,14 @@ export class ProfileService {
       });
   }
 
+  async findOneById(id: number) {
+    return await this.profileRespository
+      .findOneOrFail(id, { relations: ["profile_likes"] })
+      .catch((err: ErrorDto) => {
+        throw new ErrorDto("profile not found", HttpStatus.NOT_FOUND);
+      });
+  }
+
   async update(id: number, updateProfileDto: UpdateProfileDto) {
     const profile = await this.profileRespository
       .findOneOrFail(id)
@@ -77,5 +85,14 @@ export class ProfileService {
   async getProfileLikes(userId: number){
     const profile = await this.findOne(userId);
     return profile.profile_likes;
+  }
+
+  async findByNickName(nickname: string){
+    const profiles =  await this.profileRespository.find()
+    return profiles.filter(e => e.nickname.toLowerCase().includes(nickname.toLowerCase()))
+  }
+
+  async findOneByNickName(nickname: string){
+    return this.profileRespository.findOneOrFail({where: {nickname}, relations: ['post', 'post.profile', 'post.post', 'post.post.profile', 'user_follow', "user_follow.profile",'user', 'user.user_follow']})
   }
 }

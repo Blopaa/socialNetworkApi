@@ -37,4 +37,14 @@ export class ProfileController {
   getUserLikes(@Req() req: TokenRequest){
     return this.profileService.getProfileLikes(req.userId)
   }
+
+  @Get("/find-nickname/:nickname")
+  findByNickname(@Param("nickname") p: string){
+    return this.profileService.findByNickName(p)
+  }
+
+  @Get("/find-one-nickname/:nickname")
+  findOneByNickname(@Param("nickname") p: string){
+    return this.profileService.findOneByNickName(p);
+  }
 }
