@@ -24,8 +24,7 @@ export class ProfileService {
 
   async create(createProfileDto: CreateProfileDto): Promise<Profile> {
     const profile = this.profileRespository.create(createProfileDto);
-    const profileSaved = await this.profileRespository.save(profile);
-    return profileSaved;
+    return await this.profileRespository.save(profile);
   }
 
   async findAll() {

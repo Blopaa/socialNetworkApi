@@ -56,7 +56,7 @@ export class PostService {
   }
 
   async findOne(id: number) {
-    return await this.postRespository.findOneOrFail(id, {relations: ['profile', 'comment', 'post', "comment.profile", "post.profile"]}).catch(() => {
+    return await this.postRespository.findOneOrFail(id, {relations: ['profile', 'comment', 'post', "comment.profile", "post.profile", "comment.post", "comment.post.profile"]}).catch(() => {
       throw new ErrorDto("user not found", HttpStatus.NOT_FOUND);
     });
   }
