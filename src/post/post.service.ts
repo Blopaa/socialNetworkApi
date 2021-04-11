@@ -52,7 +52,7 @@ export class PostService {
     const allPosts = await this.postRespository.find({
       relations: ["profile", "post", "comment", "post.profile"]
     });
-    return allPosts.reverse().slice(0, order * 10 + 10);
+    return allPosts.sort((a,b) => a.id < b.id ? 1 : -1).slice(0, order * 10 + 10);
   }
 
   async findOne(id: number) {
